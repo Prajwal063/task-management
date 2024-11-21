@@ -4,6 +4,7 @@ const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 const cors = require('cors');
+const passport = require('passport');
 const dotenv = require('dotenv');
 
 // Load config
@@ -18,10 +19,13 @@ connectDB();
 app.use(express.json());
 app.use(cors());
 
+// Initialize Passport
+app.use(passport.initialize());
+
 // Define Routes
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes);  // Now, use '/api/auth' for all auth-related routes
 app.use('/api/users', userRoutes);
-app.use('/api', taskRoutes);
+app.use('/api/tasks', taskRoutes); // Fixed path to '/api/tasks' if tasks route exists
 
 const PORT = process.env.PORT || 5000;
 

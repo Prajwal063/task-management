@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const User = require('../models/User')
+const User = require('../models/User');
 
 exports.register = async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
-
 
   try {
     let user = await User.findOne({ email });
@@ -31,9 +30,8 @@ exports.register = async (req, res) => {
       },
     };
 
-    jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: 360000,
-    }, (err, token) => {
+    // Generate JWT token
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 360000 }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });
@@ -42,7 +40,6 @@ exports.register = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
-
 
 exports.login = async (req, res) => {
   const { email, password } = req.body;
@@ -66,9 +63,8 @@ exports.login = async (req, res) => {
       },
     };
 
-    jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: 360000,
-    }, (err, token) => {
+    // Generate JWT token
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 360000 }, (err, token) => {
       if (err) throw err;
       res.json({ token });
     });
@@ -78,12 +74,34 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.googleLoginSuccess = (req, res) => {
+// Google login success, issue JWT token
+exports.googleLoginSuccess = async (req, res) => {
   if (req.user) {
-    res.status(200).json({
-      success: true,
-      message: 'Successfully logged in',
-      user: req.user
+    const { id, email, firstName, lastName } = req.user;
+
+    // Check if the user exists, if not create a new one
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      user = new User({
+        firstName,
+        lastName,
+        email,
+        password: 'google-oauth-password', // Placeholder password
+      });
+      await user.save();
+    }
+
+    // Issue JWT token for Google login
+    const payload = {
+      user: {
+        id: user.id,
+      },
+    };
+
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 360000 }, (err, token) => {
+      if (err) throw err;
+      res.json({ token });
     });
   } else {
     res.status(403).json({ success: false, message: 'Not authorized' });

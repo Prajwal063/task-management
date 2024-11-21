@@ -31,16 +31,6 @@ const Register = () => {
     }
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post('/api/auth/register', { firstName, lastName, email, password });
-      navigate('/login');
-    } catch (err) {
-      setError('Registration failed');
-    }
-  };
-
   return (
     <Box component="form" onSubmit={handleSubmit} sx={{ maxWidth: 400, mx: 'auto', p: 3 }}>
 
@@ -129,7 +119,7 @@ const Register = () => {
           variant="contained" 
           sx={{ backgroundColor: 'blue', textTransform: 'none' }}
           href='/auth/google' //change for passportjs register
-          onSubmit={handleRegister}
+          
         >
           Sign up with <span style={{ fontWeight: 'bold' }}>Google</span>
         </Button>

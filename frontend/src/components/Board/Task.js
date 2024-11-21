@@ -8,7 +8,7 @@ const Task = ({ task, onEdit, onView, onDelete }) => {
     item: { id: task._id },
     collect: (monitor) => ({
       isDragging: !!monitor.isDragging(),
-    }),
+    }), 
   });
 
   const formatDate = (dateString) => {
